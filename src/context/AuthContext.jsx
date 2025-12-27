@@ -6,13 +6,25 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  // Do not auto-login from localStorage — require explicit login/signup
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if user is logged in (stored in localStorage)
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error("Failed to parse user data", error);
+        localStorage.removeItem("user");
+      }
+    }
+    setLoading(false);
+  }, []);
 
   // Function to save user data after login
   const login = (userData) => {
-    // Persist user locally but do NOT auto-apply on app start
-    try { localStorage.setItem("user", JSON.stringify(userData)); } catch (e) { /* ignore */ }
+    localStorage.setItem("user", JSON.stringify(userData));
     setUser(userData);
   };
 
