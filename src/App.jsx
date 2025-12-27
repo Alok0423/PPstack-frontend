@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Contact from './pages/Contact';
 import Dashboard from './pages/Dashboard';
+import NotificationsPage from './components/ui/NotificationsPage.jsx.jsx';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import WhatsAppButton from './components/ui/WhatsAppButton';
 
@@ -29,6 +30,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/notifications" element={<NotificationsPage />} />
       </Routes>
       
       {/* Global Floating Elements */}

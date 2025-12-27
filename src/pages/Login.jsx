@@ -10,6 +10,7 @@ const Login = () => {
   const { login } = useAuth();
 
   const [form, setForm] = useState({ email: '', password: '' });
+  const [role, setRole] = useState('learner');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [loadingGoogle, setLoadingGoogle] = useState(false);
@@ -42,7 +43,9 @@ const Login = () => {
     try {
       const data = await loginWithEmail(form.email, form.password);
       login(data);
-      const route = data?.role === 'tutor' ? '/tutor-dashboard' : '/learner-dashboard';
+      // Prefer server role if present, otherwise use user's selected role
+      const finalRole = data?.role || role;
+      const route = finalRole === 'tutor' ? '/tutor-dashboard' : '/learner-dashboard';
       navigate(route);
     } catch (err) {
       console.error('Email login failed', err);
@@ -92,10 +95,16 @@ const Login = () => {
               </div>
 
               <div className="flex items-center justify-between text-sm">
-                <label className="inline-flex items-center gap-2">
-                  <input type="checkbox" className="rounded" />
-                  Remember me
-                </label>
+                <div className="flex items-center gap-4">
+                  <label className={`inline-flex items-center gap-2 ${role === 'learner' ? 'font-semibold' : ''}`}>
+                    <input type="radio" name="role" value="learner" checked={role === 'learner'} onChange={(e) => setRole(e.target.value)} />
+                    Learner
+                  </label>
+                  <label className={`inline-flex items-center gap-2 ${role === 'tutor' ? 'font-semibold' : ''}`}>
+                    <input type="radio" name="role" value="tutor" checked={role === 'tutor'} onChange={(e) => setRole(e.target.value)} />
+                    Tutor
+                  </label>
+                </div>
                 <Link to="/contact" className="text-sky-600 hover:underline">Forgot?</Link>
               </div>
 

@@ -152,8 +152,11 @@ const NotificationItem = ({ notif, index }) => {
   );
 };
 
+import { useNotifications } from '../../context/NotificationsContext';
+
 export default function NotificationsPage() {
   const [filter, setFilter] = useState('all');
+  const { notifications, markAllRead } = useNotifications();
 
   return (
     <div className="min-h-screen bg-gray-50/50">
@@ -197,13 +200,13 @@ export default function NotificationsPage() {
         </div>
 
         {/* Notifications List */}
-        <div className="space-y-1">
-          {NOTIFICATIONS.map((notif, index) => (
+          <div className="space-y-1">
+           {notifications.map((notif, index) => (
              <NotificationItem key={notif.id} notif={notif} index={index} />
-          ))}
+           ))}
           
           {/* Empty State */}
-          {NOTIFICATIONS.length === 0 && (
+          {notifications.length === 0 && (
             <div className="text-center py-20">
               <div className="bg-white p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 shadow-sm">
                  <Bell className="text-gray-300" size={32} />

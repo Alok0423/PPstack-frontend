@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Home, Search, Bell, TrendingUp, Clock, Star, Users, Play, MessageSquare, CheckCircle 
 } from 'lucide-react';
+import { useNotifications } from '../../context/NotificationsContext';
 
 // --- Animation Settings ---
 const transition = {
@@ -59,46 +62,42 @@ const HoveredLink = ({ children, href, icon: Icon }) => {
   );
 };
 
-const NotificationDropdown = () => (
-  <div className="w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-    <div className="p-4 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
-      <h3 className="font-semibold text-gray-900">Notifications</h3>
-      <span className="text-xs font-medium text-indigo-600 cursor-pointer hover:text-indigo-800">
-        Mark all read
-      </span>
+const NotificationDropdown = () => {
+  const { notifications, markAllRead, unreadCount } = useNotifications();
+  return (
+    <div className="w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+      <div className="p-4 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+        <h3 className="font-semibold text-gray-900">Notifications</h3>
+        <button onClick={markAllRead} className="text-xs font-medium text-indigo-600 cursor-pointer hover:text-indigo-800">Mark all read</button>
+      </div>
+      <div className="max-h-[320px] overflow-y-auto custom-scrollbar">
+        {notifications.map((notif, i) => (
+          <div key={notif.id} className={`flex gap-4 p-4 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-50 last:border-0 ${notif.unread ? 'bg-indigo-50/30' : ''}`}>
+            <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${notif.avatar ? '' : 'bg-gray-100'}`}>
+              {notif.avatar ? <img src={notif.avatar} className="w-8 h-8 rounded-full object-cover" alt="a" /> : <Bell size={14} />}
+            </div>
+            <div>
+              <p className="text-sm text-gray-700 leading-snug font-medium">{notif.user ? `${notif.user} — ` : ''}{notif.message}</p>
+              <p className="text-xs text-gray-400 mt-1">{notif.time}</p>
+            </div>
+            {notif.unread && <div className="h-2 w-2 rounded-full bg-indigo-500 mt-1.5 shrink-0" />}
+          </div>
+        ))}
+      </div>
+      <div className="p-3 bg-gray-50 text-center border-t border-gray-100">
+        <a href="/notifications" className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 block w-full">
+          View All Notifications ({unreadCount})
+        </a>
+      </div>
     </div>
-    <div className="max-h-[320px] overflow-y-auto custom-scrollbar">
-       {/* Mock Notifications */}
-       {[
-         { icon: Users, color: "bg-blue-100 text-blue-600", text: "New student enrolled in React Mastery", time: "2 min ago", unread: true },
-         { icon: Star, color: "bg-yellow-100 text-yellow-600", text: "You earned a 'Top Instructor' badge!", time: "1 hour ago", unread: true },
-         { icon: Play, color: "bg-purple-100 text-purple-600", text: "Your course 'Advanced Node' is now live", time: "2 hours ago", unread: false },
-         { icon: MessageSquare, color: "bg-green-100 text-green-600", text: "Alex commented on your lecture", time: "5 hours ago", unread: false }
-       ].map((notif, i) => (
-         <div key={i} className={`flex gap-4 p-4 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-50 last:border-0 ${notif.unread ? 'bg-indigo-50/30' : ''}`}>
-           <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${notif.color}`}>
-             <notif.icon size={14} />
-           </div>
-           <div>
-             <p className="text-sm text-gray-700 leading-snug font-medium">{notif.text}</p>
-             <p className="text-xs text-gray-400 mt-1">{notif.time}</p>
-           </div>
-           {notif.unread && <div className="h-2 w-2 rounded-full bg-indigo-500 mt-1.5 shrink-0" />}
-         </div>
-       ))}
-    </div>
-    <div className="p-3 bg-gray-50 text-center border-t border-gray-100">
-      <a href="/notifications" className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 block w-full">
-        View All Notifications
-      </a>
-    </div>
-  </div>
-);
+  );
+};
 
 // --- Main Navbar Component ---
 
 export default function Navbar() {
   const [active, setActive] = useState(null);
+  const { user } = useAuth();
 
   return (
     <div className="fixed top-6 inset-x-0 max-w-5xl mx-auto z-50 px-4">
@@ -174,7 +173,7 @@ export default function Navbar() {
           >
             <button 
               className="p-2 text-gray-500 hover:text-indigo-600 relative transition-colors"
-              onClick={() => window.location.href = '/notifications'}
+              // keep hover panel; navigation below uses Link
             >
               <Bell className="h-5 w-5" />
               <span className="absolute top-1.5 right-1.5 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white animate-pulse" />
@@ -197,10 +196,17 @@ export default function Navbar() {
             </AnimatePresence>
           </div>
           
-          {/* Profile Avatar */}
-          <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-md cursor-pointer hover:shadow-indigo-200 transition-all hover:scale-105">
-            AL
-          </div>
+          {/* Auth / Profile Actions */}
+          {!user ? (
+            <div className="flex items-center gap-3">
+              <Link to="/login" className="text-sm text-gray-700 hover:text-indigo-600">Log in</Link>
+              <Link to="/signup" className="px-3 py-1 bg-indigo-600 text-white rounded-full text-sm hover:bg-indigo-700">Sign up</Link>
+            </div>
+          ) : (
+            <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-md cursor-pointer hover:shadow-indigo-200 transition-all hover:scale-105">
+              {user.name ? user.name.split(' ').map(n=>n[0]).slice(0,2).join('') : 'AL'}
+            </div>
+          )}
         </div>
 
       </div>

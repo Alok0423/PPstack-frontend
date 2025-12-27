@@ -6,6 +6,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { BrowserRouter } from 'react-router-dom';
 // Import the AuthProvider we created earlier
 import { AuthProvider } from './context/AuthContext.jsx';
+import { NotificationsProvider } from './context/NotificationsContext.jsx';
 
 // Use environment variable `VITE_GOOGLE_CLIENT_ID` (set in .env.local)
 // Fallback to the string in case env isn't provided (use only for quick local testing).
@@ -15,10 +16,12 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <GoogleOAuthProvider clientId={clientId}>
       <BrowserRouter>
-        {/* FIX: Wrap the entire App in AuthProvider so Navbar can access user data */}
-        <AuthProvider>
-          <App />
-        </AuthProvider>
+        <NotificationsProvider>
+          {/* FIX: Wrap the entire App in AuthProvider so Navbar can access user data */}
+          <AuthProvider>
+            <App />
+          </AuthProvider>
+        </NotificationsProvider>
       </BrowserRouter>
     </GoogleOAuthProvider>
   </React.StrictMode>,
