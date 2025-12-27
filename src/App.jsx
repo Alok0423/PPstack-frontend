@@ -10,6 +10,7 @@ import Contact from './pages/Contact';
 import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import WhatsAppButton from './components/ui/WhatsAppButton';
+import NotificationsPage from './components/ui/NotificationsPage.jsx.jsx';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/notifications" element={<NotificationsPage />} />
       </Routes>
       
       {/* Global Floating Elements */}

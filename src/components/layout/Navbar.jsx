@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Home, Search, Bell, TrendingUp, Clock, Star, Users, Play, MessageSquare, CheckCircle 
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 // --- Animation Settings ---
 const transition = {
@@ -172,13 +173,10 @@ export default function Navbar() {
             className="relative" 
             onMouseEnter={() => setActive('notifications')}
           >
-            <button 
-              className="p-2 text-gray-500 hover:text-indigo-600 relative transition-colors"
-              onClick={() => window.location.href = '/notifications'}
-            >
+            <Link to="/notifications" className="p-2 text-gray-500 hover:text-indigo-600 relative transition-colors inline-flex items-center">
               <Bell className="h-5 w-5" />
               <span className="absolute top-1.5 right-1.5 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white animate-pulse" />
-            </button>
+            </Link>
             
             {/* Floating Notification Panel */}
             <AnimatePresence>
